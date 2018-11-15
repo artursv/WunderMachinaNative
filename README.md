@@ -1,10 +1,10 @@
 # Wundertools Native
 
-Configuration for setting up Drupal development environment. Based on Wundertools built by Wunder.
+Wrapper scripts for Ansible playbooks that aid in creating fast and stable Drupal development environment. Based on [WunderTools](https://wundertools.wunder.io) built by [Wunder](https://wunder.io/).
 
 ### What is this for
 
-Running multiple Drupal sites on the same time with as little overhead (virtualisation) as possible. 
+Running multiple Drupal sites at the same time with as no overhead.
 
 ### Requirements
 
@@ -21,7 +21,7 @@ Copy the default configuration file.
 
     cp exaple.local.yml local.yml
 
-Provision your laptop
+Provision everything.
 
     ./provision.sh
 
