@@ -27,8 +27,6 @@ popd > /dev/null
 # Parse project config
 PROJECTCONF=$ROOT/project.yml
 eval $(parse_yaml $PROJECTCONF)
-ALIASFILE=${project_name}.aliases.drushrc.php
-ALIASTARGET=$HOME/.drush/$ALIASFILE
 
 if [ -z "$wundertools_branch" ]; then
   GITBRANCH="master"
@@ -37,7 +35,7 @@ else
 fi
 
 if [ -z "$wundertools_repository" ]; then
-  WUNDERTOOLSREPOSITORY="wunderio/WunderToolsNatvie"
+  WUNDERTOOLSREPOSITORY="artursv/WunderToolsNative"
 else
   WUNDERTOOLSREPOSITORY=$wundertools_repository
 fi
