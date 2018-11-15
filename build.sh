@@ -37,7 +37,7 @@ else
 fi
 
 if [ -z "$wundertools_repository" ]; then
-  WUNDERTOOLSREPOSITORY="wunderio/WunderTools"
+  WUNDERTOOLSREPOSITORY="wunderio/WunderToolsNatvie"
 else
   WUNDERTOOLSREPOSITORY=$wundertools_repository
 fi
