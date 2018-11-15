@@ -74,27 +74,8 @@ self_update() {
       cd $ROOT
     fi
   fi
-
-  # Use secrets if it's defined in conf/project.yml
-  # Do this for everything else than local vagrant provisioning
-  if [ "$ENVIRONMENT" != "vagrant" ] && [ "$wundersecrets_remote" != "" ]; then
-    # Set defaults for WunderSecrets
-    export wundersecrets_branch=${wundersecrets_branch-master}
-
-    # Clone and update virtual environment secrets
-    if [ ! -d "$wundersecrets_path" ]; then
-      git clone  -b $wundersecrets_branch $wundersecrets_remote $wundersecrets_path
-      if [ -n "$wundersecrets_revision" ]; then
-        git -C "$wundersecrets_path" reset --hard $wundersecrets_revision
-      fi
-    else
-      if [ -z "$wundersecrets_revision" ]; then
-        git -C "$wundersecrets_path" pull
-        git -C "$wundersecrets_path" checkout $wundersecrets_branch
-      fi
-    fi
-  fi
 }
+
 pushd `dirname $0` > /dev/null
 ROOT=`pwd -P`
 popd > /dev/null
@@ -109,7 +90,6 @@ else
   GITBRANCH=$wundertools_branch
 fi
 
-export wundersecrets_path=$ROOT/secrets
 
 self_update
 
@@ -123,19 +103,12 @@ while getopts ":hfrp:m:t:s:" opt; do
         show_help
         exit 0
         ;;
-    p)  VAULT_FILE=$OPTARG
-        ;;
-    f)  FIRST_RUN=1
-        ;;
     r)  SKIP_REQUIREMENTS=1
-        ;;
-    m)  MYSQL_ROOT_PASS=$OPTARG
         ;;
     t)  ANSIBLE_TAGS=$OPTARG
         ;;
     s)  ANSIBLE_SKIP_TAGS=$OPTARG
         ;;
-    *)  EXTRA_OPTS="$EXTRA_OPTS -$OPTARG"
     esac
 done
 
@@ -145,14 +118,6 @@ ENVIRONMENT=$1
 if [ -z $ENVIRONMENT ]; then
   show_help
   exit 1
-fi
-
-if [ -z $VAULT_FILE ]; then
-  echo -e "\e[31mVault password file missing.\e[0m"
-  echo -e "You can provide the path to the file with -p option."
-  echo -e "Alternatively you can set WT_ANSIBLE_VAULT_FILE environment variable."
-  echo -e "If you don't have any ansible-vault encrypted config file this is just fine,"
-  echo -e "Otherwise your provisioning will fail horribly.\e[31mYou have been warned!\e[0m"
 fi
 
 pushd `dirname $0` > /dev/null
@@ -191,18 +156,6 @@ fi
 # Install ansible-galaxy roles
 if [ -f $ROOT/conf/requirements.yml ]; then
   pipenv run ansible-galaxy install -r $ROOT/conf/requirements.yml
-fi
-
-# Setup&Use WunderSecrets if the additional config file exists
-if [ -f $wundersecrets_path/ansible.yml ]; then
-  WUNDER_SECRETS="--extra-vars=@$wundersecrets_path/ansible.yml"
-else
-  WUNDER_SECRETS=""
-fi
-
-# Use vault encrypted file from WunderSecrets when available
-if [ "$VAULT_FILE" != "" ] && [ -f $wundersecrets_path/vault.yml ]; then
-  WUNDER_SECRETS="$WUNDER_SECRETS --extra-vars=@$wundersecrets_path/vault.yml"
 fi
 
 if [ $ANSIBLE_TAGS ]; then
