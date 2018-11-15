@@ -25,14 +25,10 @@ function parse_yaml {
 
 show_help() {
 cat <<EOF
-Usage: ${0##*/} [-fm MYSQL_ROOT_PASS] [-t|s ANSIBLE_TAGS] [-p ANSIBLE_VAULT_FILE] [ENVIRONMENT]
-      -f                    First run, use when provisioning new servers.
+Usage: ${0##*/} [-t|s ANSIBLE_TAGS]
       -r                    Skip installing requirements from ansible/requirements.txt.
-      -m MYSQL_ROOT_PASS    For first run you need to provide new mysql root password.
-      -p ANSIBLE_VAULT_FILE Path to ansible vault password. This can also be provided with WT_ANSIBLE_VAULT_FILE environment variable.
       -t ANSIBLE_TAGS       Ansible tags to be provisioned.
       -s ANSIBLE_TAGS       Ansible tags to be skipped when provisioning.
-         ENVIRONMENT        Environment to be provisioned.
 EOF
 
 }
@@ -113,7 +109,7 @@ while getopts ":hfrp:m:t:s:" opt; do
 done
 
 shift "$((OPTIND-1))"
-ENVIRONMENT=$1
+ENVIRONMENT=local
 
 if [ -z $ENVIRONMENT ]; then
   show_help
