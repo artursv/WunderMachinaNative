@@ -49,7 +49,6 @@ self_update() {
       cd $ROOT
       curl -s -o $SELF $UPDATEURL
       echo "Update complete, please rerun any command you were running previously."
-      echo "See CHANGELOG for more info."
       echo "Also remember to add updated script to git."
       exit
     fi
