@@ -6,6 +6,11 @@ Configuration for setting up Drupal development environment. Based on Wundertool
 
 Running multiple Drupal sites on the same time with as little overhead (virtualisation) as possible. 
 
+### Requirements
+
+- Centos7
+- Ansible
+
 ### Installing
 
 Clone the repository. Copy the eample environment.yml file to enviroment.yml and run `build.sh up`.
