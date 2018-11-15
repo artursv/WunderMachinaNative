@@ -19,7 +19,9 @@
     - { role: selenium, tags: [ 'selenium' ] }
 
   vars:
-    
+    # We need this in order to shut up SELinux 
+    ansible_python_interpreter: "/usr/bin/python"    
+
     # Generic variables
     wkv_site_env: local
     php_env_vars_include_db: true
