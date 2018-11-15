@@ -19,7 +19,7 @@ function parse_yaml {
 
 # Remember to update this on each release
 # Also update the changelog!
-VERSION=8
+VERSION=1
 
 pushd `dirname $0` > /dev/null
 ROOT=`pwd -P`
