@@ -1,0 +1,136 @@
+---
+- name: Set up local development environments
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  roles:
+    - { role: nginx, tags: [ 'nginx' ] }
+    - { role: memcached, tags: [ 'memcached' ] }
+    - { role: php-fpm, tags: [ 'php-fpm' ] }
+    - { role: varnish, tags: [ 'varnish' ] }
+    - { role: drush, tags: [ 'drush' ] }
+    - { role: dbserver, tags: [ 'dbserver' ] }
+    - { role: drupal-db, tags: [ 'drupal-db' ] }
+    - { role: selfencrypt, tags: [ 'selfencrypt' ] }
+    - { role: sslterminator, tags: [ 'sslterminator' ] }
+    - { role: devtools, tags: [ 'devtools' ] }
+    - { role: mailhog, tags: [ 'mailhog' ] }
+    - { role: elasticsearch, tags: ['elasticsearch'] }
+    - { role: selenium, tags: [ 'selenium' ] }
+
+  vars:
+    
+    # Generic variables
+    wkv_site_env: local
+    php_env_vars_include_db: true
+    expose_php_vars_globally: true
+    varnish_control_key: something-randomly-generated
+    nginx_disable_content_security_policy: True
+    
+    elasticsearch_version: 2
+    # This is for ES5 only.
+    # elasticsearch_heap_size: 200m
+    
+    # These are enabled by default on servers so we have to set these to FALSE here. 
+    papertrail_enabled: false
+    partition_var_lib_mysql: false
+    
+    # Possible values php56u, php71u, php72u
+    php_package: "php72u"
+    
+    drush_use_launcher: false
+
+    composer: {
+        path: "/home/arturs/.config/composer",
+    }
+
+    # How to assign memory for each role and set the correct
+    # amount of worker processes / threads
+    memory_db: 1024 # In MB
+    memory_app: 1024 # In MB
+    # NOTE: ALWAYS leave some spare memory for the server
+
+    # Make sure changes to PHP files are not ignored
+    php_ini:
+      - section: OPCACHE
+        options:
+          - key: opcache.validate_timestamps
+            val: 1
+          - key: opcache.revalidate_freq
+            val: 0
+
+    # letsencrypt variables are also used by selfencrypt
+    letsencrypt_email: "{{ support_email }}"
+    letsencrypt_domains:
+      - local.drupal.com
+
+    # Apps I want to run on this server
+    apps:
+      - server_name: local.drupal.com
+        server_forwards: drupalcom
+        http_port: 8080
+        docroot: /var/www/drupal.com/drupal/web
+
+      - server_name: local.drupal2.com
+        server_forwards: drupal2com
+        http_port: 8080
+        docroot: /var/www/drupal2.com/drupal/web
+
+    # This server also acts as a load balancer
+    varnish:
+      port: 8081
+      memory: 512M
+      probe_resource_url: "_ping.php"
+      control_key: "{{ varnish_control_key }}"
+      acl_internal:
+        - ip: 127.0.0.1
+      acl_purge:
+        - ip: 127.0.0.1
+      acl_upstream_proxy:
+        - ip: 127.0.0.1
+      directors:
+        - name: drupalcom
+          host: local.drupal.com
+          backends:
+            - name: drupalcom_http
+              address: 127.0.0.1
+              port: 8080
+        - name: drupal2com
+          host: local.drupal2.com
+          backends:
+            - name: drupal2com_http
+              address: 127.0.0.1
+              port: 8080
+
+    # BUT, we only use https for this host
+    sslterminators:
+      - server_name: local.drupal.com
+        ssl_certificate: /etc/nginx/ssl/certificate.crt
+        ssl_certificate_key: /etc/nginx/ssl/certificate.key
+        backends:
+          - 127.0.0.1:8081
+      - server_name: local.drupal2.com
+        ssl_certificate: /etc/nginx/ssl/certificate.crt
+        ssl_certificate_key: /etc/nginx/ssl/certificate.key
+        backends:
+          - 127.0.0.1:8081
+
+    # Optionally set HTTPS redirect
+    httpforwards: {}
+    
+    # Define the databases.
+    databases:
+      - name: drupal
+        user: drupal
+        pass: drupal
+        hosts:
+          - "127.0.0.1"
+          - "::1"
+          - "localhost"
+      - name: drupal2
+        user: drupal2
+        pass: drupal2
+        hosts:
+          - "127.0.0.1"
+          - "::1"
+          - "localhost"

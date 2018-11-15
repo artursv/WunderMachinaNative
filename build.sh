@@ -16,6 +16,11 @@ function parse_yaml {
       }
    }'
 }
+
+# Remember to update this on each release
+# Also update the changelog!
+VERSION=8
+
 pushd `dirname $0` > /dev/null
 ROOT=`pwd -P`
 popd > /dev/null
@@ -38,34 +43,33 @@ else
 fi
 
 
-  VERSIONFILE=$ROOT/VERSION
-  CHANGELOG=$ROOT/CHANGELOG
-  CHANGELOGURL="https://raw.githubusercontent.com/$WUNDERTOOLSREPOSITORY/$GITBRANCH/CHANGELOG"
+VERSIONFILE=$ROOT/VERSION
+CHANGELOG=$ROOT/CHANGELOG
+CHANGELOGURL="https://raw.githubusercontent.com/$WUNDERTOOLSREPOSITORY/$GITBRANCH/CHANGELOG"
 
-  if [ -f $VERSIONFILE ]; then
+if [ -f $VERSIONFILE ]; then
     typeset -i CURRENT_VERSION=$(<$VERSIONFILE)
-  else
+else
     CURRENT_VERSION=0
-  fi
+fi
 
-  if [ "$CURRENT_VERSION" -ne "$VERSION" ]; then
+if [ "$CURRENT_VERSION" -ne "$VERSION" ]; then
     echo -e "\033[0;31mBuild.sh version has been updated.\033[0m Make sure your project complies with the changes outlined in the CHANGELOG since version $CURRENT_VERSION"
     while read -p "I have updated everything ([y]es / [n]o / show [c]hangelog)? " -n 1 -r && [[ $REPLY =~ ^[Cc]$ ]]; do
-      echo $CHANGELOGURL
-      if [ ! -f $CHANGELOG ]; then
-        curl -s -o $CHANGELOG $CHANGELOGURL
-      fi
-      sed -e '/^'$CURRENT_VERSION'$/,$d' $CHANGELOG
+        echo $CHANGELOGURL
+        if [ ! -f $CHANGELOG ]; then
+            curl -s -o $CHANGELOG $CHANGELOGURL
+        fi
+        sed -e '/^'$CURRENT_VERSION'$/,$d' $CHANGELOG
     done
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-      echo $VERSION > $VERSIONFILE
-      echo "Current version updated, make sure to commit all the changes before continuing."
+        echo $VERSION > $VERSIONFILE
+        echo "Current version updated, make sure to commit all the changes before continuing."
     else
-      echo "Please update everything to comply with the latest version before continuing!"
-      exit 0
+        echo "Please update everything to comply with the latest version before continuing!"
+        exit 0
     fi
-  fi
 fi
 
 if command -v md5sum >/dev/null 2>&1; then
