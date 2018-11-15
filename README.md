@@ -9,15 +9,25 @@ Running multiple Drupal sites on the same time with as little overhead (virtuali
 ### Requirements
 
 - Centos7
-- Ansible
+- Python 2.7 
 
-### Installing
+### Usage
 
-Clone the repository. Copy the eample environment.yml file to enviroment.yml and run `build.sh up`.
+Clone the repository in a folder of your choice
 
-## Versioning
+    git clone git@github.com:artursv/WunderToolsNative.git && cd WunderToolsNative
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+Copy the default configuration file.
+
+    cp exaple.local.yml local.yml
+
+Provision your laptop
+
+    ./provision.sh
+
+Provision a specific role.
+
+    ./provision.sh -t nginx
 
 ## License
 
