@@ -4,7 +4,7 @@ Wrapper scripts for Ansible playbooks that aid in creating fast and stable Drupa
 
 ### What is this for
 
-Running multiple Drupal sites at the same time with as no overhead.
+Running multiple Drupal sites at the same time with as little overhead as possible.
 
 ### Requirements
 
